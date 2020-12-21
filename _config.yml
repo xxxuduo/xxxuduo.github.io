@@ -55,3 +55,14 @@ kramdown:
 sass:
   style: compressed
   sourcemap: never
+
+# To use Gittalk comments  https://github.com/gitalk/gitalk#Usage
+# jekyll synatx: https://jekyllrb.com/docs/liquid/
+gittalk:
+  # Note: A GitHub Application is needed for authorization, if you don't have one, going to https://github.com/settings/applications/new register a new one.
+  # You must specify the website domain url in the Authorization callback URL field.
+  clientID: 7741dfe9e7f9fb8037ba
+  clientSecret: a5e05745cdabc36ae6825830993c4c3961874e4d
+  repository: xxxuduo.github.io
+  owner: xxxuduo
+  admin: xxxuduo 
