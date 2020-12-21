@@ -2,7 +2,7 @@
 title: Write/Read Barrier
 layout: post
 categories: [Java, Concurrent]
-image: /assets/img/notes/image-20200904134354414.png
+image: /assets/img/notes/writebarrier.png
 description: "Welcome"
 ---
 
