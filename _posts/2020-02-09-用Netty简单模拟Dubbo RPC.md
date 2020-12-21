@@ -1,7 +1,7 @@
 ---
 title: 用Netty简单模拟Dubbo RPC
 layout: post
-categories: [Concurrent, Java]
+categories: [Netty, Java, Distributed System]
 image: /assets/img/rpc.jpg
 description: "Welcome"
 ---
