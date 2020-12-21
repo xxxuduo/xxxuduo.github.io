@@ -4,7 +4,7 @@ analytics-id: #leave blank to not use Analytics
 #Subtitle
 subtitle:
   active: true
-  text: Technology + Life = Me
+  text: Welcome to my space!
 
 #Nav
 nav:
