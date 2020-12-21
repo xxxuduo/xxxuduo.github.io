@@ -34,6 +34,10 @@
     {% if site.data.settings.comments %}
       {% include comments.html %}
     {% endif %}
+	
+	{% if site.gittalk.clientID and site.gittalk.clientSecret %}
+      {% include gitalk-comment.html %}
+    {% endif %}
   </div>
 
 {%- include footer.html -%}
