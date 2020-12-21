@@ -27,3 +27,8 @@ Welcome to YAMT - Yet Another Minimal Theme. YAMT is a minimal Jekyll theme focu
 
 ## Customization
 [Read here](https://github.com/PandaSekh/Jekyll-YAMT#customize).
+
+
+
+![图片下标](../assets/img/logo.jpg)
+
