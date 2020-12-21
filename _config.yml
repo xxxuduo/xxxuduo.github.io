@@ -1,19 +1,19 @@
 # Site settings
-title: YAMT
-description: "Yet Another Minimal Theme"
+title: Duo Space
+description: "Tech notes + life notes"
 url:  "https://xxxuduo.github.io/" # Actual base url of the website
 baseurl: "/"           # url of the jekyll blog. e.g. if you set url to "mysite.com" and baseurl to "blog", the jekyll website will work on "mysite.com/blog"
 author:
-  name: "Alessio Franceschi"
-  email: "alessiofranceschi2@gmail.com"
-  url: "https://alessiofranceschi.me"
+  name: "Duo Xu"
+  email: "xxxuduo@gmail.com"
+  url: "https://xxxuduo.github.io/"
 permalink: /:year/:month/:day/:title:output_ext
 
 #Plugins
 plugins: [jekyll-paginate, jekyll-feed, jekyll-seo-tag, jekyll-sitemap]
 
 #Pagination
-paginate: 3
+paginate: 5
 paginate_path: "/page:num/"
 
 #SEO
@@ -27,15 +27,15 @@ facebook:
 logo: /assets/img/logo.jpg
 social:
   links: #List your social links here
-    - https://twitter.com/PandaSekh
+    # - https://twitter.com/PandaSekh
     - https://www.github.com/pandasekh
     - https://www.linkedin.com/in/alessio-franceschi/
 webmaster_verifications:
-  google: 
-  bing: 
-  alexa: 
-  yandex: 
-  baidu: 
+  google:
+  bing:
+  alexa:
+  yandex:
+  baidu:
 lang: en_US
 
 #Highlighter
