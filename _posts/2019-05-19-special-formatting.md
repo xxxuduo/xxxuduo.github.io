@@ -1,7 +1,7 @@
 ---
 title: Special Formatting
 layout: post
-categories: [Tips, Markdown, Typography]
+categories: [Markdown]
 image: /assets/img/forest-snow.jpg
 description: "A bunch of tips on how to format your text."
 customexcerpt: "Learn and discover the special features of YAMT."
@@ -17,7 +17,7 @@ Code:
 ``` 
 * random line to make it work. This will be removed.
 {:toc}
-``` 
+```
 
 ### Syntax Highlight
 In YAMT you can highlight code in various ways.
@@ -32,7 +32,7 @@ Code:
 ``` 
     ``` lang
         //your code 
-    ```
+```
 ```    
     
 <br>
@@ -44,7 +44,7 @@ public static void main (String[] args){
 }
 {% endhighlight %}
 Code:
-``` 
+```
     {/% highlight lang %}
         //your code 
     {/% endhighlight java %}
@@ -60,7 +60,7 @@ public static void main (String[] args){
 }
 {% endhighlight %}
 Code:
-``` 
+```
     {/% highlight lang linenos%}
         //your code 
     {/% endhighlight java %}
@@ -115,7 +115,7 @@ Another inline: \\( \frac{v^2} {2} + {g}{z} + \frac{p} {ρ} = constant \\)
 
 ### Alerts
 <span class = "alert r">Warning!</span>
-``` html
+​``` html
 <span class = "alert r"></span>
 ```
 <span class = "alert g">Solved.</span>

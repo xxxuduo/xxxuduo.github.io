@@ -1,7 +1,7 @@
 ---
-title: Getting Started
+title: Front Matter
 layout: post
-categories: [How-To, Markdown]
+categories: [Markdown]
 image: /assets/img/airplane.jpg
 #gif: mygif
 description: "Let's get this theme to work!"

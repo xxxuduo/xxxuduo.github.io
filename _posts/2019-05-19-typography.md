@@ -1,7 +1,7 @@
 ---
 title: Typography
 layout: post
-categories: [Typography, Markdown]
+categories: [Markdown]
 image: /assets/img/rose.jpg
 description: "Basic typography and styling for your posts."
 customexcerpt: "Basic and advanced typography in YAMT."
