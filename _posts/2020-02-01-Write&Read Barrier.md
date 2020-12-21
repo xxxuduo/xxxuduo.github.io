@@ -1,12 +1,10 @@
 ---
-title: 线程的六种状态
+title: Write/Read Barrier
 layout: post
 categories: [Java, Concurrent]
 image: /assets/img/notes/image-20200904134354414.png
 description: "Welcome"
 ---
-
-## Write/Read Barrier
 
 压测之后可以发现：
 
