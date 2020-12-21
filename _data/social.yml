@@ -3,9 +3,9 @@
 
 
 social:
-  - {icon: 'github', type: "brand", link: 'https://www.github.com/pandasekh'}
-  - {icon: 'weixin', type: "brand", link: 'https://twitter.com/PandaSekh'}
+  - {icon: 'github', type: "brand", link: 'https://github.com/xxxuduo'}
+  - {icon: 'weixin', type: "brand", link: 'https://xxxuduo.github.io'}
   - {icon: 'linkedin', type: "brand", link: 'https://www.linkedin.com/in/alessio-franceschi/'}
 
-  - {icon: 'envelope', type: "solid", link: 'mailto:alessiofranceschi2@gmail.com'}
+  - {icon: 'envelope', type: "solid", link: 'xxxuduo@gmail.com'}
   - {icon: 'rss', type: "solid", link: "/feed.xml"}
