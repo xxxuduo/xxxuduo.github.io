@@ -14,3 +14,9 @@ title: About
 Programming Language: **Java**, C++, Python, C, R, SQL, Assembly
 
 Frameworks/Tools： Netty, Spring Boot, ELK stack, Handoop, Redis, Git, Docker, Kubernates, JProfiler
+
+### Contact Info
+
+📞 +8615000253945
+
+📧 xxxuduo@gmail.com
