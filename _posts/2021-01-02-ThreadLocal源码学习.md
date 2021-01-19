@@ -1,12 +1,12 @@
 ---
-title: 线程的六种状态
+title: ThreadLocal 源码学习
 layout: post
 categories: [Java]
 image: /assets/img/notes/image-20210118205659318.png
 description: "Welcome"
 ---
 
-# ThreadLocal 源码学习
+
 
 ThreadLocal的作用是提供线程内的局部变量，不同的线程之间不会互相干扰，这种变量在线程的生命周期内起作用，减少通一个线程内多个函数或组件之间一些公共变量传递的复杂度。
 
