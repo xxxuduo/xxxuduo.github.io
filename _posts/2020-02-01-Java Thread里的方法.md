@@ -1,10 +1,12 @@
 ---
-title: Java Thread类里的方法
+title: Java Thread类里的方法——start()\interrupt()\join()等
 layout: post
 categories: [Java, concurrent]
 image: /assets/img/notes/Multithread_ThreadRunnable.png
 description: "Welcome"
 ---
+
+## Java线程
 
 ### 启动线程
 
@@ -188,7 +190,7 @@ private static void test1() throws InterruptedException {
 
 **打断 sleep，wait，join 的线程**，这几个方法都会让线程进入阻塞状态。
 
-- 打断sleep的线程，会清空打断状态，
+##### 打断sleep的线程，会清空打断状态，
 
 ```java
 private static void test1() throws InterruptedException {
@@ -210,7 +212,7 @@ java.lang.InterruptedException: sleep interrupted
 21:18:10.374 [main] c.TestInterrupt - 打断状态: false
 ```
 
-- 打断正常运行的线程，不会清空打断状态
+##### 打断正常运行的线程，不会清空打断状态
 
 ```java
 private static void test2() throws InterruptedException {
@@ -236,6 +238,66 @@ private static void test2() throws InterruptedException {
 20:57:37.964 [t2] c.TestInterrupt - 打断状态: true 
 ```
 
+##### 打断park线程，不会清空状态
+
+```java
+private static void test3() throws InterruptedException {
+ 	Thread t1 = new Thread(() -> {
+ 		log.debug("park...");
+ 		LockSupport.park();
+ 		log.debug("unpark...");
+ 		log.debug("打断状态：{}", Thread.currentThread().isInterrupted());
+ 	}, "t1");
+ 	t1.start();
+ 	sleep(0.5);
+ 	t1.interrupt();
+}
+```
+
+输出：
+
+```java
+21:11:52.795 [t1] c.TestInterrupt - park...
+21:11:53.295 [t1] c.TestInterrupt - unpark...
+21:11:53.295 [t1] c.TestInterrupt - 打断状态：true 
+```
+
+如果打断标记已经是 true, 则 park 会失效.
+
+```java
+private static void test4() {
+ 	Thread t1 = new Thread(() -> {
+ 		for (int i = 0; i < 5; i++) {
+ 			log.debug("park...");
+        	LockSupport.park();
+ 			log.debug("打断状态：{}", Thread.currentThread().isInterrupted());
+ 		}
+ 	});
+ 	t1.start();
+	 sleep(1);
+ 	t1.interrupt();
+}
+```
+
+输出：只有第一次进行了一秒钟
+
+```
+21:13:48.783 [Thread-0] c.TestInterrupt - park...
+21:13:49.809 [Thread-0] c.TestInterrupt - 打断状态：true
+21:13:49.812 [Thread-0] c.TestInterrupt - park...
+21:13:49.813 [Thread-0] c.TestInterrupt - 打断状态：true
+21:13:49.813 [Thread-0] c.TestInterrupt - park...
+21:13:49.813 [Thread-0] c.TestInterrupt - 打断状态：true
+21:13:49.813 [Thread-0] c.TestInterrupt - park...
+21:13:49.813 [Thread-0] c.TestInterrupt - 打断状态：true
+21:13:49.813 [Thread-0] c.TestInterrupt - park...
+21:13:49.813 [Thread-0] c.TestInterrupt - 打断状态：true 
+```
+
+**可以使用Thread.interrupted()来清除打断状态**
+
+
+
 ### 两阶段终止模式Two Phase Termination
 
 在一个线程 T1 中如何“优雅”终止线程 T2？这里的【优雅】指的是给 T2 一个料理后事的机会。
@@ -251,7 +313,7 @@ private static void test2() throws InterruptedException {
 
 ![image-20210121145326004](/assets/img/notes/image-20210121145326004.png)
 
-#### 利用isInterrupted()
+#### 利用isInterrupted()打断sleep线程
 
 interrupt 可以打断正在执行的线程，无论这个线程是在 sleep，wait，还是正常运行
 
@@ -355,4 +417,6 @@ t.stop();
 11:54:54.502 c.TestTwoPhaseTermination [main] - stop
 11:54:54.502 c.TPTVolatile [监控线程] - 料理后事
 ```
+
+
 
