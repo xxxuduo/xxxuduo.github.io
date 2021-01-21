@@ -6,13 +6,185 @@ image: /assets/img/notes/writebarrier.png
 description: "Welcome"
 ---
 
-压测之后可以发现：
+### 名词 
 
-情况1： r.r1 = 1   num变量没修改成功
+- Clock Cycle Time 主频的概念大家接触的比较多，而 CPU 的 Clock Cycle Time（时钟周期时间），等于主频的倒数，意思是 CPU 能 够识别的最小时间单位，比如说 4G 主频的 CPU 的 Clock Cycle Time 就是 0.25 ns，作为对比，我们墙上挂钟的 Cycle Time 是 1s 例如，运行一条加法指令一般需要一个时钟周期时间 
+- CPI 有的指令需要更多的时钟周期时间，所以引出了 CPI （Cycles Per Instruction）指令平均时钟周期数 
+- IPC IPC（Instruction Per Clock Cycle） 即 CPI 的倒数，表示每个时钟周期能够运行的指令数 CPU 执行时间 程序的
+- CPU 执行时间，即我们前面提到的 user + system 时间，可以用下面的公式来表示
 
-情况2： r.r1 = 4	num变量修改成功
+>程序 CPU 执行时间 = 指令数 * CPI * Clock Cycle Time
 
-情况3： 指令重排序了 在赋值之前ready已经set成了true
+### 指令重排序优化
+
+事实上，现代处理器会设计为一个时钟周期完成一条执行时间最长的 CPU 指令。为什么这么做呢？可以想到指令 还可以再划分成一个个更小的阶段，例如，每条指令都可以分为： 取指令 - 指令译码 - 执行指令 - 内存访问 - 数据 写回 这 5 个阶段
+
+![image-20210121155756965](C:\Users\XDU4SGH\xxxuduo.github.io\assets\img\notes\image-20210121155756965.png)
+
+>- instruction fetch (IF) 
+>- instruction decode (ID) 
+>- execute (EX) 
+>- memory access (MEM) 
+>- register write back (WB)
+
+在不改变程序结果的前提下，这些指令的各个阶段可以通过重排序和组合来实现指令级并行，指令重排的前提是，重排指令不能影响结果，李如意
+
+```java
+// 可以重排的例子
+int a = 10; // 指令1
+int b = 20; // 指令2
+System.out.println( a + b );
+// 不能重排的例子
+int a = 10; // 指令1
+int b = a - 5; // 指令2
+```
+
+### 支持流水线的处理器
+
+现代 CPU 支持多级指令流水线，例如支持同时执行 取指令 - 指令译码 - 执行指令 - 内存访问 - 数据写回 的处理 器，就可以称之为五级指令流水线。这时 CPU 可以在一个时钟周期内，同时运行五条指令的不同阶段（相当于一 条执行时间最长的复杂指令），IPC = 1，本质上，流水线技术并不能缩短单条指令的执行时间，但它变相地提高了 指令地吞吐率。
+
+![image-20210121160256332](C:\Users\XDU4SGH\xxxuduo.github.io\assets\img\notes\image-20210121160256332.png)
+
+
+
+
+
+可见性：
+
+- 写屏障（sfence）保证在该屏障之前的，对共享变量的改动，都同步到主存当中
+- 读屏障（lfence）保证在该屏障之后，对共享变量的读取，加载的是主存中的最新数据。
+
+有序性：
+
+- 写屏障会确保指令重排序时，不会讲些屏障之前的代码排在些屏障之后
+- 读屏障会确保指令重排序时，不会将读屏障之后的代码排在读屏障之前。
+
+### SuperScalar 处理器
+
+大多数处理器包含多个执行单元，并不是所有计算功能都集中在一起，可以再细分为整数运算单元、浮点数运算单 元等，这样可以把多条指令也可以做到并行获取、译码等，CPU 可以在一个时钟周期内，执行多于一条指令，IPC > 1
+
+![image-20210121160641150](C:\Users\XDU4SGH\xxxuduo.github.io\assets\img\notes\image-20210121160641150.png)
+
+### CPU缓存结构原理
+
+#### CPU缓存结构
+
+![image-20210121160826757](C:\Users\XDU4SGH\xxxuduo.github.io\assets\img\notes\image-20210121160826757.png)
+
+查看cpu缓存行
+
+>root@yihang01 ~ cat /sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size 
+>
+>64
+
+cpu 拿到的内存地址格式是这样的
+
+> [高位组标记] [低位索引] [偏移量]
+
+
+
+#### CPU缓存读
+
+读取数据流程如下 
+
+- 根据低位，计算在缓存中的索引 
+- 判断是否有效 
+  - 0 去内存读取新数据更新缓存行 
+  - 1 再对比高位组标记是否一致
+    - 一致，根据偏移量返回缓存数据 
+    - 不一致，去内存读取新数据更新缓存行
+
+### 内存屏障
+
+- 可见性 
+  - 写屏障（sfence）保证在该屏障之前的，对共享变量的改动，都同步到主存当中 
+  - 而读屏障（lfence）保证在该屏障之后，对共享变量的读取，加载的是主存中最新数据 
+- 有序性
+  - 写屏障会确保指令重排序时，不会将写屏障之前的代码排在写屏障之后 
+  - 读屏障会确保指令重排序时，不会将读屏障之后的代码排在读屏障之前
+
+### volatile原理
+
+volatile 的底层实现原理是内存屏障，Memory Barrier（Memory Fence） 
+
+- 对 volatile 变量的写指令后会加入写屏障 
+- 对 volatile 变量的读指令前会加入读屏障
+
+#### 如何保证可见性
+
+- 写屏障保证在该屏障之前的，对共享变量的改动，都同步到主存中
+
+- ```java
+  int num = 0;
+  boolean ready = false;
+  public void actor2(I_Result r) {
+   	num = 2;
+   	ready = true; // ready 是 volatile 赋值带写屏障
+   	// 写屏障
+  }
+  
+  ```
+
+- 而读屏障（lfence）保证在该屏障之后，对共享变量的读取，加载的是主存中最新数据
+
+  
+
+- ```java
+  public void actor1(I_Result r) {
+   	// 读屏障
+   	// ready 是 volatile 读取值带读屏障
+   	if(ready) {
+   		r.r1 = num + num;
+   	} else {
+   		r.r1 = 1;
+   	}
+  }
+  ```
+
+  ```mermaid
+  sequenceDiagram
+  	participant t1 as t1 线程
+  	participant num as num = 0
+  	participant ready as volatile ready = false
+  	participant t2 as t2 线程
+  	t1-->>t1: num = 2
+  	t1 ->>ready: ready = true
+  	Note over t1, ready: 写屏障
+  	Note over num, t2:读屏障
+  	t2 ->>ready:读取ready=true
+  	t2 ->>num: 读取num=2
+  ```
+
+根据之前的actor1，可能会有如下几种情况：
+
+- 线程1限制性，这是ready = false，所以进入else，分支结果为1
+- 线程2先只能num = 2，但还没来得及执行ready = true，线程1执行，还是进入else分支，结果为1
+- 线程2执行到ready = true，线程1执行，这回进入if分支，结果为4，（num已经执行过了）
+- 还有可能**是0**，线程2只能ready=true，切换到线程1，进入if分支，相加的0，再切回线程2执行，num = 2；
+
+#### 保证有序性
+
+还是那句话，不能解决指令交错：
+
+- 写屏障仅仅是保证之后的读能够读到最新的结果，但不能保证读跑到它前面去 
+- 而有序性的保证也只是保证了本线程内相关代码不被重排序
+
+JIT及时编译器的优化无法预判。
+
+```mermaid
+sequenceDiagram
+	participant t1 as t1 线程
+	participant i as volatile i=0
+	participant t2 as t2 线程
+	t2-->>i:读取i=0（无法保证数据最新）
+	t1-->>i:读取i=0
+	t1-->>t1:i+1
+	t1-->>i:写入i=1
+	t2-->>t2:i-1
+	t2-->>i:写入i=-1
+```
+
+
 
 
 
