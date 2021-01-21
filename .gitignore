@@ -9,3 +9,5 @@ _site/
 .sass-cache/
 .jekyll-cache/
 .jekyll-metadata
+_posts/2020-02-09-用Netty简单模拟Dubbo RPC.md
+assets/img/notes/Synchronization.png
