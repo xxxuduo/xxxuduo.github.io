@@ -2,7 +2,7 @@
 title: Monitor原理、对象头和Java中锁的优化
 layout: post
 categories: [Java, Concurrent]
-image: /assets/img/notes/Synchronization.png
+image: /assets/img/notes/image-20210121235039647.png
 description: "Welcome"
 ---
 
