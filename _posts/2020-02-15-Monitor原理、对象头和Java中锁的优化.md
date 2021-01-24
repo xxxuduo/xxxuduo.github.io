@@ -31,6 +31,95 @@ public class TestFinal {
 
 发现 final 变量的赋值也会通过 putfield 指令来完成，同样在这条指令之后也会加入写屏障，保证在其它线程读到 它的值时不会出现为 0 的情况
 
+对于final域，编译器和处理器要遵守两个重排序规则：
+
+1.在构造函数内对一个final域的写入，与随后把这个被构造对象的引用赋值给一个引用变量，这两个操作之间不能重排序。
+
+　　（先写入final变量，后调用该对象引用）
+
+　　原因：编译器会在final域的写之后，插入一个StoreStore屏障
+
+2.初次读一个包含final域的对象的引用，与随后初次读这个final域，这两个操作之间不能重排序。
+
+　　（先读对象的引用，后读final变量）
+
+　　编译器会在读final域操作的前面插入一个LoadLoad屏障 
+
+```java
+public class FinalExample {
+    int i; // 普通变量
+    final int j; // final 变量
+    static FinalExample obj;
+
+    public void FinalExample() { // 构造函数
+        i = 1; // 写普通域
+        j = 2; // 写 final 域
+    }
+
+    public static void writer() { // 写线程 A 执行
+        obj = new FinalExample();
+    }
+
+    public static void reader() { // 读线程 B 执行
+        FinalExample object = obj; // 读对象引用
+        int a = object.i; // 读普通域         a=1或者a=0或者直接报错i没有初始化
+        int b = object.j; // 读 final域      b=2
+    }
+}
+```
+
+第一种情况：**写普通域的操作被编译器重排序到了构造函数之外**
+
+而写 final 域的操作，被写 final 域的重排序规则“限定”在了构造函数之内，读线程 B 正确的读取了 final 变量初始化之后的值。
+
+写 final 域的重排序规则可以确保：在对象引用为任意线程可见之前，对象的 final 域已经被正确初始化过了，而普通域不具有这个保障。
+
+
+
+![image-final](/assets/img/notes/2057382895.png)
+
+第二种情况：读对象的普通域的操作被处理器重排序到读对象引用之前
+
+而读 final 域的重排序规则会把读对象 final 域的操作“限定”在读对象引用之后，此时该 final 域已经被 A 线程初始化过了，这是一个正确的读取操作。
+
+读 final 域的重排序规则可以确保：在读一个对象的 final 域之前，一定会先读包含这个 final 域的对象的引用。
+
+对于**引用类型**，写 final 域的重排序规则对编译器和处理器增加了如下约束：
+
+在构造函数内对一个 final 引用的对象的成员域的写入，与随后在构造函数外把这个被构造对象的引用赋值给一个引用变量，这两个操作之间不能重排序。
+
+```java
+public class FinalReferenceExample {
+    final int[] intArray; // final 是引用类型
+    static FinalReferenceExample obj;
+
+    public FinalReferenceExample() { // 构造函数
+        intArray = new int[1]; // 1
+        intArray[0] = 1; // 2
+    }
+
+    public static void writerOne() { // 写线程 A 执行
+        obj = new FinalReferenceExample(); // 3
+    }
+
+    public static void writerTwo() { // 写线程 B 执行
+        obj.intArray[0] = 2; // 4
+    }
+
+    public static void reader() { // 读线程 C 执行
+        if (obj != null) { // 5
+            int temp1 = obj.intArray[0]; // 6  temp1=1或者temp1=2，不可能等于0
+        }
+    }
+}
+```
+
+![image-final-reference](/assets/img/notes/887668155.png)
+
+在上图中，1 是对 final 域的写入，2 是对这个 final 域引用的对象的成员域的写入，3 是把被构造的对象的引用赋值给某个引用变量。这里除了前面提到的 1 不能和 3 重排序外，2 和 3 也不能重排序。
+
+JMM 可以确保读线程 C 至少能看到写线程 A 在构造函数中对 final 引用对象的成员域的写入。即 C 至少能看到数组下标 0 的值为 1。而写线程 B 对数组元素的写入，读线程 C 可能看的到，也可能看不到。JMM 不保证线程 B 的写入对读线程 C 可见，因为写线程 B 和读线程 C 之间存在数据竞争，此时的执行结果不可预知。
+
 ### Monitor概念
 
 #### Java对象头
@@ -49,6 +138,8 @@ Monitor 被翻译为监视器或管程
 |--------------------------------|------------------------|
 ```
 
+![image-20210124215104335](/assets/img/notes/image-20210124215104335.png)
+
 数组对象
 
 ```
@@ -59,6 +150,8 @@ Monitor 被翻译为监视器或管程
 |--------------------------------|-----------------------|------------------------|
 
 ```
+
+![image-20210124215118491](/assets/img/notes/image-20210124215118491.png)
 
 Mark Word 结构是
 
@@ -79,6 +172,8 @@ Mark Word 结构是
 
 ```
 
+![image-20210124215134729](/assets/img/notes/image-20210124215134729.png)
+
 64 位虚拟机 Mark Word
 
 ```
@@ -97,7 +192,7 @@ Mark Word 结构是
 |---------------------------------------------------------------|--------------------|
 ```
 
-
+![image-20210124215149050](/assets/img/notes/image-20210124215149050.png)
 
 每个 Java 对象都可以关联一个 Monitor 对象(Monitor对象是由操作系统提供，在java中看不到他的表示)，如果使用 synchronized 给对象上锁（重量级）之后，该对象头的 Mark Word 中就被设置指向 Monitor 对象的指针，即记住Monitor的地址（ptr_to_heavyweight_monitor）。
 
